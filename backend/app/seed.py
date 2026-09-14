@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
 from core.security import hash_password
-from database import create_db_table, engine
+from database import create_db_and_tables, engine
 from models import User
 
 
