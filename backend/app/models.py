@@ -15,14 +15,21 @@ class UserBase(SQLModel):
         name = " ".join(name.split())
 
         if not name:
-            raise ValueError("Name cannot be empty after removing whitespaces.")
+            raise ValueError(
+                "Name cannot be empty after removing whitespaces."
+            )
 
         return name
+
 
 class UserRead(UserBase):
     id: uuid.UUID
     created_at: datetime.datetime
     is_admin: bool
+
+
+class UserCreate(UserBase):
+    password: str
 
 
 class User(UserBase, table=True):
@@ -32,6 +39,7 @@ class User(UserBase, table=True):
     )
     password_hash: str = Field(min_length=1, max_length=1024)
     is_admin: bool = Field(default=False)
+    hashed_password: str = Field(default=None)
 
 
 class Category(SQLModel, table=True):
