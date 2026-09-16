@@ -48,7 +48,7 @@ def signup_user(
 
         if (
             isinstance(db_error, UniqueViolation)
-            and db_error.diag.column_name == "ix_users_email"
+            and db_error.diag.constraint_name == "ix_user_email"
         ):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
