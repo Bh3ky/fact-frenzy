@@ -1,7 +1,6 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
@@ -43,8 +42,13 @@ def signup_user(
     except IntegrityError as exc:
         # reset the session after the failed transaction
         session.rollback()
-        if 'unique' in str(exc.orig).lower() or 'ix_user_email' in str(exc.orig).lower():
-            raise HTTPException(status_code=409, detail='Email already registered.') from exc
+        if (
+            "unique" in str(exc.orig).lower()
+            or "ix_user_email" in str(exc.orig).lower()
+        ):
+            raise HTTPException(
+                status_code=409, detail="Email already registered."
+            ) from exc
 
         raise
 
