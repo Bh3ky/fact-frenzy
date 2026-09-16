@@ -43,17 +43,8 @@ def signup_user(
     except IntegrityError as exc:
         # reset the session after the failed transaction
         session.rollback()
-
-        db_error = exc.orig
-
-        if (
-            isinstance(db_error, UniqueViolation)
-            and db_error.diag.constraint_name == "ix_user_email"
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Email already registered.",
-            ) from exc
+        if 'unique' in str(exc.orig).lower() or 'ix_user_email' in str(exc.orig).lower():
+            raise HTTPException(status_code=409, detail='Email already registered.') from exc
 
         raise
 
