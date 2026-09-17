@@ -21,6 +21,16 @@ class UserBase(SQLModel):
 
         return name
 
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, email: str) -> str:
+        email = email.strip().lower()
+
+        if not email:
+            raise ValueError("Email cannot be empty.")
+
+        return email
+
 
 class UserRead(UserBase):
     id: uuid.UUID
@@ -29,7 +39,7 @@ class UserRead(UserBase):
 
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(min_length=8, max_length=128)
 
 
 class User(UserBase, table=True):
@@ -39,7 +49,6 @@ class User(UserBase, table=True):
     )
     password_hash: str = Field(min_length=1, max_length=1024)
     is_admin: bool = Field(default=False)
-    hashed_password: str = Field(default=None)
 
 
 class Category(SQLModel, table=True):
