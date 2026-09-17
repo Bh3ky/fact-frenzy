@@ -65,3 +65,26 @@ def test_signup_missing_password_returns_422(client: TestClient):
     assert any(
         error["loc"] == ["body", "password"] for error in body["detail"]
     )
+
+
+def test_signup_normalizes_email_and_rejects_duplicate(client: TestClient):
+    user_data1 = {
+        "name": "Jane Doe",
+        "email": "Jane.doe@example.com",
+        "password": "Cookiejar123",
+    }
+    response1 = client.post("/auth/signup", json=user_data1)
+
+    assert response1.status_code == 201
+    body = response1.json()
+    assert body["email"] == "jane.doe@example.com"
+
+    user_data2 = {
+        "name": "Jane Doe",
+        "email": "jane.doe@example.com",
+        "password": "Cookiejar123",
+    }
+    response2 = client.post("/auth/signup", json=user_data2)
+
+    assert response2.status_code == 409
+    assert response2.json()["detail"] == "Email already registered."

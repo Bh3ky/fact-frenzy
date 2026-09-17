@@ -21,6 +21,16 @@ class UserBase(SQLModel):
 
         return name
 
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, email: str) -> str:
+        email = email.strip().lower()
+
+        if not email:
+            raise ValueError("Email cannot be empty.")
+
+        return email
+
 
 class UserRead(UserBase):
     id: uuid.UUID
